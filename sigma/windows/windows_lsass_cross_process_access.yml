@@ -1,0 +1,33 @@
+title: Suspicious Cross-Process Access to LSASS
+id: b0f7b826-cf3a-4b7e-a58b-9143f89c2982
+status: experimental
+description: Detects processes requesting access to LSASS with rights commonly associated with credential access.
+author: asdasddqwdq29-a11y
+date: 2026-06-06
+references:
+  - https://attack.mitre.org/techniques/T1003/001/
+logsource:
+  product: windows
+  category: process_access
+detection:
+  selection_target:
+    TargetImage|endswith: '\lsass.exe'
+  selection_access:
+    GrantedAccess:
+      - '0x1010'
+      - '0x1410'
+      - '0x1438'
+      - '0x1fffff'
+  filter_known_system:
+    SourceImage|endswith:
+      - '\MsMpEng.exe'
+      - '\csrss.exe'
+  condition: selection_target and selection_access and not filter_known_system
+falsepositives:
+  - Endpoint security products and authorized diagnostic tools
+  - Crash collection or memory forensics performed by administrators
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1003.001
+
