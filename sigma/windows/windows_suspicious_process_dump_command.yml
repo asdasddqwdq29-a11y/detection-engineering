@@ -1,0 +1,33 @@
+title: Suspicious Process Memory Dump Command
+id: 04acfbb9-6c70-4c90-a4c9-317cfe7e5dd0
+status: experimental
+description: Detects command lines commonly used to create a process memory dump that may expose credentials.
+author: asdasddqwdq29-a11y
+date: 2026-06-06
+references:
+  - https://attack.mitre.org/techniques/T1003/001/
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection_comsvcs:
+    Image|endswith: '\rundll32.exe'
+    CommandLine|contains|all:
+      - 'comsvcs.dll'
+      - 'MiniDump'
+  selection_dump_tools:
+    Image|endswith:
+      - '\procdump.exe'
+      - '\procdump64.exe'
+    CommandLine|contains:
+      - 'lsass'
+      - 'lsass.exe'
+  condition: 1 of selection_*
+falsepositives:
+  - Authorized incident response and memory-forensics collection
+  - Administrator troubleshooting under an approved change
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1003.001
+
